@@ -13,5 +13,5 @@ setup(
   description = "A wrapper to call set & get affinity from python (linux only)",
   author = "The COMPSs Team",
   author_email = "sergio.rodriguez@bsc.es",
-  url = "https://github.com/srgrr/thread_affinity"
+  url = "https://github.com/bsc-wdc/thread_affinity"
 )
