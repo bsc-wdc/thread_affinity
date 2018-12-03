@@ -11,4 +11,4 @@ before_script:
     - python setup.py install --user
 
 
-script: py.test -v
+script: py.test -v test/TestThreadAffinityLibrary.py
