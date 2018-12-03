@@ -25,6 +25,7 @@
 #include <structmember.h>
 #include <unistd.h>
 #include <sched.h>
+#include <sys/sysinfo.h>
 #include <vector>
 
 /*
@@ -35,7 +36,7 @@
   - pid: if zero, this will be transformed to the current pid
   Returns None
 */
-static PyObject* pysched_setaffinity(PyObject* self, PyObject* args);
+static PyObject *pysched_setaffinity(PyObject* self, PyObject* args);
 
 /*
   Wrapper for sched_getaffinity.
@@ -43,7 +44,20 @@ static PyObject* pysched_setaffinity(PyObject* self, PyObject* args);
   - pid (OPTIONAL): if zero or ommited, this will be transformed to the current pid
   Returns the list of allowed CPUs
 */
-static PyObject* pysched_getaffinity(PyObject* self, PyObject* args);
+static PyObject *pysched_getaffinity(PyObject* self, PyObject* args);
+
+/*
+  Wrapper for get_nprocs.
+  No arguments.
+  Returns the number of processors.
+*/
+static PyObject *get_num_cpus(PyObject *self, PyObject *args);
+
+
+/*
+  Return the default affinity computed when loading this module
+*/
+static PyObject *get_default_affinity(PyObject *self, PyObject *args);
 
 extern "C" {
 #if PY_MAJOR_VERSION >= 3

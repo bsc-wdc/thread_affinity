@@ -37,9 +37,10 @@ error_out(PyObject *m) {
 
 //////////////////////////////////////////////////////////////
 
+// Computed in the init function of the module
 cpu_set_t default_affinity;
 
-static PyObject* pysched_setaffinity(PyObject* self, PyObject* args) {
+static PyObject *pysched_setaffinity(PyObject *self, PyObject *args) {
     long long pid = 0ll;
     PyObject* cpu_list;
     if(!PyArg_ParseTuple(args, "O|l", &cpu_list, &pid)) {
@@ -55,42 +56,69 @@ static PyObject* pysched_setaffinity(PyObject* self, PyObject* args) {
     if(sched_setaffinity(pid, sizeof(cpu_set_t), &to_assign) < 0) {
         if(sched_setaffinity(pid, sizeof(cpu_set_t), &default_affinity) < 0) {
             PyErr_SetString(PyExc_RuntimeError, "Cannot set default affinity (!)");
-        } else {
-            PyErr_SetString(PyExc_RuntimeError, "setaffinity failed, setting default affinity");
         }
     }
     Py_RETURN_NONE;
 }
 
-static PyObject* pysched_getaffinity(PyObject* self, PyObject* args) {
+static PyObject *_mask_to_python_list(cpu_set_t& set_cpus) {
+    // Convert to Python List
+    std::vector< int > ret_val;
+    for(int i = 0; i < get_nprocs(); ++i) {
+        if(CPU_ISSET(i, &set_cpus)) {
+            ret_val.push_back(i);
+        }
+    }
+    PyObject *ret = PyList_New(int(ret_val.size()));
+    for(int i = 0; i < int(ret_val.size()); ++i) {
+        PyList_SetItem(ret, i, Py_BuildValue("i", ret_val[i]));
+    }
+    return ret;
+}
+
+static PyObject  *pysched_getaffinity(PyObject *self, PyObject *args) {
     long long pid = 0ll;
     if(!PyArg_ParseTuple(args, "|l", &pid)) {
         return NULL;
     }
-    if(pid == 0ll) pid = getpid();
+    if(pid == 0ll) {
+        pid = getpid();
+    }
     cpu_set_t set_cpus;
     if(sched_getaffinity(pid, sizeof(cpu_set_t), &set_cpus) < 0) {
         PyErr_SetString(PyExc_RuntimeError, "Error during sched_getaffinity call!");
         Py_RETURN_NONE;
     }
-    std::vector< int > ret_val;
-    for(int i = 0; i < __CPU_SETSIZE; ++i) {
-        if(CPU_ISSET(i, &set_cpus)) ret_val.push_back(i);
+    return _mask_to_python_list(set_cpus);
+}
+
+static PyObject *get_default_affinity(PyObject *self, PyObject *args) {
+    if(!PyArg_ParseTuple(args, "")) {
+        return NULL;
     }
-    PyObject* py_ret = PyList_New(int(ret_val.size()));
-    for(int i = 0; i < int(ret_val.size()); ++i) {
-        PyList_SetItem(py_ret, i, Py_BuildValue("i", ret_val[i]));
+    return _mask_to_python_list(default_affinity);
+}
+
+static PyObject *get_num_cpus(PyObject *self, PyObject *args) {
+    if(!PyArg_ParseTuple(args, "")) {
+        return NULL;
     }
-    return py_ret;
+    long long ret = get_nprocs();
+    return Py_BuildValue("l", ret);
 }
 
 //////////////////////////////////////////////////////////////
 
-
+// setaffinity and getaffinity are here for legacy purposes, do not remove them,
+// they are NOT a typo!
 static PyMethodDef ThreadAffinityMethods[] = {
     { "error_out", (PyCFunction)error_out, METH_NOARGS, NULL},
     { "setaffinity", pysched_setaffinity, METH_VARARGS, "Args: (mask, [pid=0]) -> set the affinity for the thread with given pid to given mask. If pid equals zero, then the current thread's affinity will be changed." },
     { "getaffinity", pysched_getaffinity, METH_VARARGS, "Args: ([pid=0]) -> returns the affinity for the thread with given pid. If not specified, returns the affinity for the current thread."},
+    { "set_affinity", pysched_setaffinity, METH_VARARGS, "Args: (mask, [pid=0]) -> set the affinity for the thread with given pid to given mask. If pid equals zero, then the current thread's affinity will be changed." },
+    { "get_affinity", pysched_getaffinity, METH_VARARGS, "Args: ([pid=0]) -> returns the affinity for the thread with given pid. If not specified, returns the affinity for the current thread."},
+    { "get_nprocs", get_num_cpus, METH_VARARGS, "No args. Return the number of available CPUs"},
+    { "get_default_affinity", get_default_affinity, METH_VARARGS, "No args. Return the default affinity for this process"},
     { NULL, NULL } /* sentinel */
 };
 
@@ -138,7 +166,7 @@ void initthread_affinity(void)
         Py_DECREF(module);
         INITERROR;
     }
-
+    // Default affinity = affinity when process initd
     sched_getaffinity(0, sizeof(cpu_set_t), &default_affinity);
 
 #if PY_MAJOR_VERSION >= 3
