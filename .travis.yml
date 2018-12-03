@@ -1,11 +1,11 @@
 
 language: python
+
 sudo: false
+
 python:
     - 2.7
     - 3.4
-script: py.test -v test/TestThreadAffinityLibrary.py
-
 
 before_script:
     - python setup.py install --user
