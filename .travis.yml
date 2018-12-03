@@ -10,4 +10,4 @@ python:
 before_script:
     - python setup.py install --user
 
-script: py.test -v test/TestThreadAffinityLibrary.py
+script: python test/TestThreadAffinityLibrary.py
