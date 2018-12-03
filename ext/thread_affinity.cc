@@ -14,7 +14,18 @@
  *  limitations under the License.
  *
  */
-#include "thread_affinity.h"
+
+/*
+  Wrappers that make possible to call thread (set|get)affinity from Python
+
+  @author: srodrig1 (sergio.rodriguez at bsc.es)
+*/
+#include <Python.h>
+#include <structmember.h>
+#include <unistd.h>
+#include <sched.h>
+#include <sys/sysinfo.h>
+#include <vector>
 
 struct module_state {
     PyObject *error;
@@ -40,6 +51,14 @@ error_out(PyObject *m) {
 // Computed in the init function of the module
 cpu_set_t default_affinity;
 
+/*
+  Wrapper for sched_setaffinity.
+  Arguments:
+  - mask: a list of integers that denote the CPU identifiers (0-based) that we
+          want to allow
+  - pid: if zero, this will be transformed to the current pid
+  Returns None
+*/
 static PyObject *pysched_setaffinity(PyObject *self, PyObject *args) {
     long long pid = 0ll;
     PyObject* cpu_list;
@@ -76,6 +95,12 @@ static PyObject *_mask_to_python_list(cpu_set_t& set_cpus) {
     return ret;
 }
 
+/*
+  Wrapper for sched_getaffinity.
+  Arguments:
+  - pid (OPTIONAL): if zero or ommited, this will be transformed to the current pid
+  Returns the list of allowed CPUs
+*/
 static PyObject  *pysched_getaffinity(PyObject *self, PyObject *args) {
     long long pid = 0ll;
     if(!PyArg_ParseTuple(args, "|l", &pid)) {
@@ -92,6 +117,9 @@ static PyObject  *pysched_getaffinity(PyObject *self, PyObject *args) {
     return _mask_to_python_list(set_cpus);
 }
 
+/*
+  Return the default affinity computed when loading this module
+*/
 static PyObject *get_default_affinity(PyObject *self, PyObject *args) {
     if(!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -99,6 +127,11 @@ static PyObject *get_default_affinity(PyObject *self, PyObject *args) {
     return _mask_to_python_list(default_affinity);
 }
 
+/*
+  Wrapper for get_nprocs.
+  No arguments.
+  Returns the number of processors.
+*/
 static PyObject *get_num_cpus(PyObject *self, PyObject *args) {
     if(!PyArg_ParseTuple(args, "")) {
         return NULL;
