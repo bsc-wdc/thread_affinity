@@ -1,4 +1,3 @@
-
 language: python
 
 sudo: false
@@ -10,4 +9,4 @@ python:
 before_script:
     - python setup.py install --user
 
-script: python test/TestThreadAffinityLibrary.py
+script: py.test -v test/TestThreadAffinityLibrary.py
