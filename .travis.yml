@@ -8,8 +8,6 @@ python:
     - 3.4
 
 before_script:
-    - python setup.py sdist
-    - pip install dist/* --user
-
+    - python setup.py install --user
 
 script: py.test -v test/TestThreadAffinityLibrary.py
