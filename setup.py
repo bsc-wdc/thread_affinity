@@ -3,7 +3,6 @@ from distutils.core import setup, Extension
 thread_affinity = \
 Extension(
   "thread_affinity",
-  include_dirs = ["ext/"],
   sources = ["ext/thread_affinity.cc"]
 )
 

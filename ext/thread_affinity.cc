@@ -27,6 +27,15 @@
 #include <sys/sysinfo.h>
 #include <vector>
 
+extern "C" {
+#if PY_MAJOR_VERSION >= 3
+    PyMODINIT_FUNC
+    PyInit_thread_affinity(void);
+#else
+    void initthread_affinity(void);
+#endif
+}
+
 struct module_state {
     PyObject *error;
 };
