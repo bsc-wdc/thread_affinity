@@ -3,6 +3,7 @@ from distutils.core import setup, Extension
 thread_affinity = \
 Extension(
   "thread_affinity",
+  extra_compile_args=["-O3"],
   sources = ["ext/thread_affinity.cc"]
 )
 
