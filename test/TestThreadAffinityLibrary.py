@@ -6,6 +6,10 @@ import sys
 import os
 import thread_affinity
 
+
+# Test results may vary if executed in different systems
+# with different amount of CPUUs
+
 def get_random_mask():
 	"""Return a random, valid affinity mask
 	Which is a subset of {0, 1, ..., 2 ** num_procs - 1}
@@ -20,8 +24,6 @@ class TestThreadAffinityLibrary(unittest.TestCase):
 	def test_set_get_affinity(self):
 		"""Test if a simple set & get works
 		"""
-		# Test results may vary if executed in different systems
-		# with different amount of CPUUs
 		random.seed(1)
 		proc_list = get_random_mask()
 		thread_affinity.setaffinity(proc_list)
@@ -38,8 +40,6 @@ class TestThreadAffinityLibrary(unittest.TestCase):
 	def test_set_get_affinity_subprocess(self):
 		"""Test if the affinity of a subprocess can be controlled from above
 		"""
-		# Test results may vary if executed in different systems
-		# with different amount of CPUUs
 		random.seed(3)
 		proc_list = get_random_mask()
 		import subprocess
