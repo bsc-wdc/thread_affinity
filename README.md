@@ -26,18 +26,20 @@ This code is a part of the Python Binding of the COMPSs Programming model develo
 installed and used separately.
 
 # Example of usage
+## Importing the library
 ```
-Python 2.7.12 (default, Nov 12 2018, 14:36:49) <br>
-[GCC 5.4.0 20160609] on linux2
-Type "help", "copyright", "credits" or "license" for more information.
 >>> import thread_affinity
->>> thread_affinity.get_nprocs()
-4
+```
+## Setting and getting the affinity of the current process
+```
 >>> thread_affinity.get_default_affinity()
 [0, 1, 2, 3]
 >>> thread_affinity.set_affinity([0,3])
 >>> thread_affinity.get_affinity()
 [0, 3]
+```
+## Setting and getting the affinity of other processes
+```
 >>> thread_affinity.get_affinity(4110)
 [0, 1, 2, 3]
 >>> thread_affinity.set_affinity([0,3], 4110)
