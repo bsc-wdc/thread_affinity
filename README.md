@@ -26,7 +26,7 @@ This code is a part of the Python Binding of the COMPSs Programming model develo
 installed and used separately.
 
 # Example of usage
-<code>
+```
 Python 2.7.12 (default, Nov 12 2018, 14:36:49) <br>
 [GCC 5.4.0 20160609] on linux2
 Type "help", "copyright", "credits" or "license" for more information.
@@ -44,5 +44,4 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> thread_affinity.get_affinity(4110)
 [0, 3]
 >>> # taskset -p 4110 returns 9 (1001)
-
-</code>
+```
