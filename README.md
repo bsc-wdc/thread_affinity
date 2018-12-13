@@ -27,7 +27,7 @@ installed and used separately.
 
 # Example of usage
 <code>
-Python 2.7.12 (default, Nov 12 2018, 14:36:49) 
+Python 2.7.12 (default, Nov 12 2018, 14:36:49) <br>
 [GCC 5.4.0 20160609] on linux2
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import thread_affinity
